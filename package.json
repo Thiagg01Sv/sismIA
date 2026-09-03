@@ -1,0 +1,19 @@
+{
+  "name": "api-sismos-sv",
+  "version": "1.0.0",
+  "description": "API en tiempo real de sismos en El Salvador, basada en el feed de USGS",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "socket.io": "^4.8.0"
+  }
+}
