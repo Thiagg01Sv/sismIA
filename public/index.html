@@ -91,8 +91,22 @@
     font-size: 13.5px;
     color: var(--ink-soft);
   }
-  nav.links a { text-decoration: none; transition: color .15s ease; }
+  nav.links a {
+    text-decoration: none;
+    transition: color .15s ease;
+    position: relative;
+    padding-bottom: 2px;
+  }
+  nav.links a::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 100%; bottom: 0;
+    height: 1px;
+    background: var(--blue-light);
+    transition: right .18s ease;
+  }
   nav.links a:hover { color: var(--ink); }
+  nav.links a:hover::after { right: 0; }
 
   .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); }
   .dot.on { background: #38C172; }
@@ -119,16 +133,14 @@
   .hero {
     position: relative;
     z-index: 1;
-    padding: 72px 0 0;
+    padding: 88px 0 0;
+    animation: subir .5s ease both;
   }
 
-  .eyebrow-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 22px;
+  @keyframes subir {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .eyebrow-row .dot { width: 6px; height: 6px; }
 
   h1 {
     font-family: 'Space Grotesk', sans-serif;
@@ -168,9 +180,10 @@
     font-size: 13.5px;
     font-weight: 500;
     border-radius: 6px;
-    transition: background .15s ease, transform .15s ease;
+    box-shadow: 0 12px 24px -12px rgba(22,87,199,.55);
+    transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
   }
-  .cta:hover { background: var(--blue-glow); transform: translateY(-1px); }
+  .cta:hover { background: var(--blue-glow); transform: translateY(-1px); box-shadow: 0 16px 28px -12px rgba(22,87,199,.65); }
 
   .cta.ghost {
     border-color: var(--line);
@@ -231,6 +244,12 @@
     align-items: center;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 20px 40px -24px rgba(0,0,0,.55);
+    transition: box-shadow .2s ease, transform .2s ease;
+  }
+  .ultimo-card:hover {
+    box-shadow: 0 24px 48px -20px rgba(0,0,0,.6);
+    transform: translateY(-1px);
   }
   .ultimo-card::before {
     content: '';
@@ -284,12 +303,12 @@
     grid-template-columns: 46px 1fr 90px auto;
     gap: 20px;
     align-items: center;
-    padding: 16px 6px;
+    padding: 16px 10px;
     border-bottom: 1px solid var(--line-soft);
     border-radius: 8px;
-    transition: background .12s ease;
+    transition: background .15s ease, transform .15s ease;
   }
-  .fila:hover { background: rgba(95,161,238,.04); }
+  .fila:hover { background: rgba(95,161,238,.05); transform: translateX(2px); }
   .fila:last-child { border-bottom: none; }
 
   .fila .mag-mini {
@@ -340,6 +359,100 @@
   .swatch.a { background: var(--amber); }
   .swatch.r { background: var(--red); }
 
+  /* ---------- Tendencia ---------- */
+  .trend-section { padding: 52px 0 8px; }
+
+  .note-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(95,161,238,.06);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    margin-bottom: 26px;
+  }
+  .note-box .icon {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--blue-light);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .note-box strong { color: var(--ink); font-weight: 600; }
+  .note-box.warn { background: rgba(242,183,5,.07); border-color: rgba(242,183,5,.35); }
+  .note-box.warn .icon { color: var(--amber); }
+  .note-box a { color: var(--blue-light); text-decoration: underline; text-underline-offset: 3px; }
+
+  .trend-card {
+    background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    box-shadow: 0 20px 40px -24px rgba(0,0,0,.55);
+  }
+  .trend-col { display: flex; flex-direction: column; gap: 10px; }
+  .trend-col .trend-lbl { font-size: 12.5px; color: var(--ink-soft); }
+  .trend-col .trend-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 30px;
+  }
+  .trend-track {
+    height: 10px;
+    border-radius: 5px;
+    background: var(--line-soft);
+    overflow: hidden;
+  }
+  .trend-fill { height: 100%; background: var(--blue-light); border-radius: 5px; transition: width .6s ease; }
+  .trend-col.actual .trend-fill { background: var(--blue-light); }
+  .trend-col.previa .trend-fill { background: var(--ink-faint); }
+
+  .trend-veredicto {
+    grid-column: 1 / -1;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line-soft);
+    padding-top: 18px;
+    margin-top: 4px;
+  }
+  .trend-veredicto strong { color: var(--ink); }
+
+  @media (max-width: 760px) {
+    .trend-card { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Clima ---------- */
+  .clima-section { padding: 52px 0 8px; }
+  .clima-frame-wrap {
+    position: relative;
+    width: 100%;
+    padding-top: 62%;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 20px 40px -24px rgba(0,0,0,.55);
+  }
+  .clima-frame-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .clima-credito {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    margin-top: 10px;
+  }
+  .clima-credito a { color: var(--ink-soft); }
+
   /* ---------- Footer ---------- */
   footer {
     border-top: 1px solid var(--line-soft);
@@ -370,7 +483,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .dot.on { animation: none; }
+    .hero { animation: none; }
   }
 </style>
 </head>
@@ -386,6 +499,8 @@
     </div>
     <nav class="links">
       <a href="#feed">Actividad</a>
+      <a href="#tendencia">Tendencia</a>
+      <a href="#clima">Clima</a>
       <a href="/api">API</a>
     </nav>
   </header>
@@ -400,10 +515,6 @@
   </div>
 
   <section class="wrap hero">
-    <div class="eyebrow-row">
-      <span class="dot on" style="animation:none;"></span>
-      <span style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft);">Monitoreo activo · El Salvador</span>
-    </div>
     <h1>Cuando tiembla,<br><span>lo sabés al instante.</span></h1>
     <p class="lead">Combinamos el catálogo global de USGS con los reportes locales del MARN para no perderte los sismos que sí se sienten pero que a veces nunca llegan a las noticias.</p>
     <div class="cta-row">
@@ -444,6 +555,46 @@
     <span><i class="swatch a"></i> 5.0 – 5.9</span>
     <span><i class="swatch r"></i> 6.0 o más</span>
   </div>
+</section>
+
+<section class="wrap trend-section" id="tendencia">
+  <p class="panel-label">Tendencia de actividad (14 días)</p>
+
+  <div class="note-box">
+    <span class="icon">i</span>
+    <span>Esto <strong>no es una predicción</strong>. Los sismos no se pueden anticipar con precisión — es un resumen de cuánta actividad ha habido, para dar contexto, nada más. Para alertas oficiales, revisá <a href="https://proteccioncivil.gob.sv/" target="_blank" rel="noopener">Protección Civil</a> o el <a href="https://www.snet.gob.sv/" target="_blank" rel="noopener">MARN</a>.</span>
+  </div>
+
+  <div class="trend-card" id="trend-card">
+    <div class="trend-col actual">
+      <span class="trend-lbl">Últimos 7 días</span>
+      <span class="trend-count" id="trend-actual">—</span>
+      <div class="trend-track"><div class="trend-fill" id="trend-actual-bar" style="width:0%"></div></div>
+    </div>
+    <div class="trend-col previa">
+      <span class="trend-lbl">7 días anteriores</span>
+      <span class="trend-count" id="trend-previa">—</span>
+      <div class="trend-track"><div class="trend-fill" id="trend-previa-bar" style="width:0%"></div></div>
+    </div>
+    <p class="trend-veredicto" id="trend-veredicto">Calculando tendencia…</p>
+  </div>
+
+  <div class="note-box warn" id="nota-replicas" style="display:none; margin-top:18px; margin-bottom:0;">
+    <span class="icon">!</span>
+    <span id="nota-replicas-texto"></span>
+  </div>
+</section>
+
+<section class="wrap clima-section" id="clima">
+  <p class="panel-label">Clima en tiempo real</p>
+  <div class="clima-frame-wrap">
+    <iframe
+      src="https://embed.windy.com/embed2.html?lat=13.79&lon=-88.90&detailLat=13.79&detailLon=-88.90&width=650&height=450&zoom=7&level=surface&overlay=rain&menu=&message=true&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1"
+      loading="lazy"
+      title="Mapa de clima en tiempo real - El Salvador">
+    </iframe>
+  </div>
+  <p class="clima-credito">Mapa vía <a href="https://www.windy.com/" target="_blank" rel="noopener">Windy.com</a>. Cambiá la capa (lluvia, viento, temperatura) desde el menú del mapa.</p>
 </section>
 
 <footer class="wrap">
@@ -533,7 +684,48 @@
     }
   }
 
+  async function cargarTendencia() {
+    try {
+      const ahora = new Date();
+      const hace14 = new Date(ahora.getTime() - 14 * 24 * 60 * 60 * 1000);
+      const res = await fetch(`/api/sismos/historico?desde=${hace14.toISOString()}&hasta=${ahora.toISOString()}`);
+      const data = await res.json();
+      const lista = data.sismos || [];
+
+      const hace7 = new Date(ahora.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const actual = lista.filter(s => new Date(s.fecha) >= hace7);
+      const previa = lista.filter(s => new Date(s.fecha) < hace7);
+
+      document.getElementById('trend-actual').textContent = actual.length;
+      document.getElementById('trend-previa').textContent = previa.length;
+
+      const maxCount = Math.max(actual.length, previa.length, 1);
+      document.getElementById('trend-actual-bar').style.width = `${(actual.length / maxCount) * 100}%`;
+      document.getElementById('trend-previa-bar').style.width = `${(previa.length / maxCount) * 100}%`;
+
+      const veredicto = document.getElementById('trend-veredicto');
+      if (actual.length === previa.length) {
+        veredicto.innerHTML = `La actividad se mantuvo <strong>igual</strong> que la semana anterior.`;
+      } else if (actual.length > previa.length) {
+        veredicto.innerHTML = `Hubo <strong>más actividad</strong> esta semana que la anterior (${actual.length} vs ${previa.length} sismos). Esto por sí solo no indica un riesgo mayor — la actividad sísmica varía naturalmente.`;
+      } else {
+        veredicto.innerHTML = `Hubo <strong>menos actividad</strong> esta semana que la anterior (${actual.length} vs ${previa.length} sismos).`;
+      }
+
+      // Aviso de réplicas: solo si hubo un sismo de magnitud considerable en los últimos 7 días.
+      const magMax = actual.reduce((m, s) => Math.max(m, s.magnitud), 0);
+      if (magMax >= 5) {
+        document.getElementById('nota-replicas').style.display = 'flex';
+        document.getElementById('nota-replicas-texto').innerHTML =
+          `Hubo un sismo de <strong>M${magMax.toFixed(1)}</strong> en los últimos 7 días. Es normal que sigan ocurriendo réplicas de menor magnitud en los próximos días — no significa que viene algo peor.`;
+      }
+    } catch (err) {
+      document.getElementById('trend-veredicto').textContent = 'No se pudo calcular la tendencia (sin conexión con la API).';
+    }
+  }
+
   cargarInicial();
+  cargarTendencia();
 
   if (window.io) {
     const socket = io(window.location.origin);
