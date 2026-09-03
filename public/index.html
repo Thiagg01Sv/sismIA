@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Thiagg SisMIA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.0/socket.io.min.js"></script>
+<style>
+  :root {
+    --bg: #081120;
+    --bg-deep: #050B16;
+    --panel: #0E1D36;
+    --panel-soft: #0C1830;
+    --line: #1C3055;
+    --line-soft: #142544;
+    --blue: #1657C7;
+    --blue-light: #5FA1EE;
+    --blue-glow: #2E6FD9;
+    --white: #FFFFFF;
+    --ink: #EAEFF8;
+    --ink-soft: #8CA0C4;
+    --ink-faint: #5A6E90;
+    --amber: #F2B705;
+    --red: #E5522E;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--blue); color: var(--white); }
+  a { color: inherit; }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ---------- Header ---------- */
+  .top {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(8, 17, 32, 0.82);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  header.wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+  }
+  .brand .logo-slot {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .brand .logo-slot img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    display: block;
+  }
+
+  nav.links {
+    display: flex;
+    gap: 26px;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  nav.links a { text-decoration: none; transition: color .15s ease; }
+  nav.links a:hover { color: var(--ink); }
+
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-faint); }
+  .dot.on { background: #38C172; }
+
+  /* ---------- Hero ---------- */
+  .hero-outer {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .hero-outer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(560px 320px at 82% 8%, rgba(95,161,238,.16), transparent 70%),
+      radial-gradient(420px 260px at 8% 90%, rgba(22,87,199,.14), transparent 70%);
+    pointer-events: none;
+  }
+
+  .ridge { position: absolute; left: 0; right: 0; bottom: -2px; height: 190px; z-index: 0; opacity: .55; }
+  .ridge svg { width: 100%; height: 100%; }
+
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 72px 0 0;
+  }
+
+  .eyebrow-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .eyebrow-row .dot { width: 6px; height: 6px; }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(40px, 5.6vw, 68px);
+    line-height: 1.03;
+    margin: 0 0 22px;
+    letter-spacing: -0.015em;
+    max-width: 16ch;
+  }
+  h1 span {
+    background: linear-gradient(92deg, var(--blue-light), #8FC2FF 60%, var(--blue-light));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero p.lead {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    max-width: 48ch;
+    margin: 0 0 32px;
+  }
+
+  .cta-row { display: flex; gap: 14px; margin-bottom: 56px; flex-wrap: wrap; }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--blue-light);
+    background: var(--blue);
+    color: var(--white);
+    text-decoration: none;
+    padding: 13px 22px;
+    font-size: 13.5px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background .15s ease, transform .15s ease;
+  }
+  .cta:hover { background: var(--blue-glow); transform: translateY(-1px); }
+
+  .cta.ghost {
+    border-color: var(--line);
+    background: transparent;
+    color: var(--ink-soft);
+  }
+  .cta.ghost:hover { border-color: var(--blue-light); color: var(--ink); background: rgba(95,161,238,.06); }
+
+  /* ---------- Stat strip ---------- */
+  .stats {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line-soft);
+  }
+  .stat {
+    padding: 26px 0 34px;
+    border-left: 1px solid var(--line-soft);
+    padding-left: 28px;
+  }
+  .stat:first-child { border-left: none; padding-left: 0; }
+  .stat .num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 34px;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat .lbl { font-size: 13px; color: var(--ink-soft); }
+
+  /* ---------- Último sismo ---------- */
+  .panel-section { padding: 52px 0 8px; }
+  .panel-label {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .panel-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line-soft);
+  }
+
+  .ultimo-card {
+    background: linear-gradient(180deg, var(--panel), var(--panel-soft));
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 30px 32px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 30px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ultimo-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--blue-light);
+  }
+  .ultimo-card.alta::before { background: var(--amber); }
+  .ultimo-card.muy-alta::before { background: var(--red); }
+
+  .ultimo-card .mag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 58px;
+    line-height: 1;
+    color: var(--blue-light);
+  }
+  .ultimo-card.alta .mag { color: var(--amber); }
+  .ultimo-card.muy-alta .mag { color: var(--red); }
+
+  .ultimo-card .detalle-lugar {
+    font-size: 19px;
+    font-weight: 500;
+    margin: 0 0 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ultimo-card .detalle-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+
+  .fuente-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+    background: rgba(95,161,238,.1);
+    border: 1px solid rgba(95,161,238,.35);
+    color: var(--blue-light);
+  }
+  .fuente-tag.marn { background: rgba(242,183,5,.1); border-color: rgba(242,183,5,.4); color: var(--amber); }
+
+  /* ---------- Feed ---------- */
+  .feed { padding: 52px 0 20px; }
+  .fila {
+    display: grid;
+    grid-template-columns: 46px 1fr 90px auto;
+    gap: 20px;
+    align-items: center;
+    padding: 16px 6px;
+    border-bottom: 1px solid var(--line-soft);
+    border-radius: 8px;
+    transition: background .12s ease;
+  }
+  .fila:hover { background: rgba(95,161,238,.04); }
+  .fila:last-child { border-bottom: none; }
+
+  .fila .mag-mini {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--blue-light);
+  }
+  .fila .mag-mini.alta { color: var(--amber); }
+  .fila .mag-mini.muy-alta { color: var(--red); }
+
+  .fila .info .lugar { font-size: 14.5px; margin-bottom: 6px; }
+  .barra-track {
+    height: 4px;
+    background: var(--line-soft);
+    border-radius: 3px;
+    width: 100%;
+    max-width: 220px;
+    overflow: hidden;
+  }
+  .barra-fill { height: 100%; background: var(--blue-light); border-radius: 3px; }
+  .barra-fill.alta { background: var(--amber); }
+  .barra-fill.muy-alta { background: var(--red); }
+
+  .fila .hora {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+
+  .vacio { color: var(--ink-soft); font-size: 14px; padding: 20px 6px; }
+
+  .escala {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 28px 6px 44px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line-soft);
+    margin-top: 8px;
+  }
+  .escala span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 8px; height: 8px; border-radius: 50%; }
+  .swatch.b { background: var(--blue-light); }
+  .swatch.a { background: var(--amber); }
+  .swatch.r { background: var(--red); }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--line-soft);
+    padding: 26px 0 44px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  footer a { text-decoration: underline; text-underline-offset: 3px; color: var(--ink-soft); }
+
+  @media (max-width: 760px) {
+    header.wrap { padding: 16px 20px; }
+    nav.links { display: none; }
+    .wrap { padding: 0 20px; }
+    .hero { padding-top: 44px; }
+    .stats { grid-template-columns: 1fr; }
+    .stat { border-left: none; padding-left: 0; border-top: 1px solid var(--line-soft); padding-top: 20px; }
+    .stat:first-child { border-top: none; }
+    .ultimo-card { grid-template-columns: auto 1fr; padding: 22px; }
+    .ultimo-card .fuente-tag { grid-column: 1 / -1; justify-self: start; }
+    .fila { grid-template-columns: 34px 1fr; row-gap: 6px; }
+    .fila .hora { grid-column: 2; text-align: left; }
+    .ridge { height: 120px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .dot.on { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <header class="wrap">
+    <div class="brand">
+      <span class="logo-slot">
+        <img src="src/resoruces/images/sismia.png" alt="Logo" onerror="this.parentElement.style.display='none'">
+      </span>
+      SISMIA SV
+    </div>
+    <nav class="links">
+      <a href="#feed">Actividad</a>
+      <a href="/api">API</a>
+    </nav>
+  </header>
+</div>
+
+<div class="hero-outer">
+  <div class="ridge">
+    <svg viewBox="0 0 1200 190" preserveAspectRatio="none">
+      <path d="M0,190 L0,140 L90,70 L140,110 L210,40 L260,95 L340,60 L420,130 L520,55 L600,100 L680,30 L760,95 L860,65 L960,120 L1060,50 L1140,100 L1200,75 L1200,190 Z" fill="#0E1D36"/>
+      <path d="M0,190 L0,160 L110,105 L180,140 L260,90 L330,135 L430,95 L540,150 L640,85 L730,140 L840,100 L940,150 L1040,110 L1140,155 L1200,130 L1200,190 Z" fill="#0C1830"/>
+    </svg>
+  </div>
+
+  <section class="wrap hero">
+    <div class="eyebrow-row">
+      <span class="dot on" style="animation:none;"></span>
+      <span style="font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink-soft);">Monitoreo activo · El Salvador</span>
+    </div>
+    <h1>Cuando tiembla,<br><span>lo sabés al instante.</span></h1>
+    <p class="lead">Combinamos el catálogo global de USGS con los reportes locales del MARN para no perderte los sismos que sí se sienten pero que a veces nunca llegan a las noticias.</p>
+    <div class="cta-row">
+      <a href="#feed" class="cta">Ver actividad reciente</a>
+      <a href="/api" class="cta ghost">Datos en crudo (API)</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="num" id="stat-total">—</div>
+        <div class="lbl">sismos en las últimas 24h</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="stat-max">—</div>
+        <div class="lbl">magnitud más alta hoy</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="stat-actualizado">—</div>
+        <div class="lbl">última actualización</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section class="wrap panel-section">
+  <p class="panel-label">Último sismo registrado</p>
+  <div class="ultimo-card" id="ultimo-sismo">
+    <span class="vacio">Cargando…</span>
+  </div>
+</section>
+
+<section class="wrap feed" id="feed">
+  <p class="panel-label">Actividad reciente</p>
+  <div id="lista-feed"><p class="vacio">Cargando sismos…</p></div>
+
+  <div class="escala">
+    <span><i class="swatch b"></i> Menor a 5.0</span>
+    <span><i class="swatch a"></i> 5.0 – 5.9</span>
+    <span><i class="swatch r"></i> 6.0 o más</span>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span>Fuentes: USGS (earthquake.usgs.gov) y MARN El Salvador (snet.gob.sv)</span>
+  <span>Desarrollado por <strong>Thiagg01Sv</strong></span>
+  <a href="/api/sismos">Ver datos en crudo (JSON)</a>
+</footer>
+
+<script>
+  function claseMagnitud(m) {
+    if (m >= 6) return 'muy-alta';
+    if (m >= 5) return 'alta';
+    return '';
+  }
+
+  function tiempoRelativo(fechaISO) {
+    const diffMs = Date.now() - new Date(fechaISO).getTime();
+    const min = Math.round(diffMs / 60000);
+    if (min < 1) return 'ahora mismo';
+    if (min < 60) return `hace ${min} min`;
+    const h = Math.round(min / 60);
+    if (h < 24) return `hace ${h} h`;
+    return `hace ${Math.round(h / 24)} d`;
+  }
+
+  function renderUltimo(s) {
+    const el = document.getElementById('ultimo-sismo');
+    const clase = claseMagnitud(s.magnitud);
+    el.className = 'ultimo-card' + (clase ? ' ' + clase : '');
+    el.innerHTML = `
+      <div class="mag">M${s.magnitud.toFixed(1)}</div>
+      <div>
+        <div class="detalle-lugar">${s.lugar}</div>
+        <div class="detalle-meta">
+          <span>${new Date(s.fecha).toLocaleString('es-SV')}</span>
+          <span>profundidad ${s.profundidad_km} km</span>
+        </div>
+      </div>
+      <span class="fuente-tag ${s.fuente.toLowerCase()}">${s.fuente}</span>
+    `;
+  }
+
+  function renderFeed(lista) {
+    const cont = document.getElementById('lista-feed');
+    if (!lista.length) {
+      cont.innerHTML = '<p class="vacio">No hay sismos registrados en las últimas 24 horas.</p>';
+      return;
+    }
+    cont.innerHTML = lista.map(s => {
+      const clase = claseMagnitud(s.magnitud);
+      const pct = Math.min(100, (s.magnitud / 7) * 100);
+      return `
+        <div class="fila">
+          <div class="mag-mini ${clase}">${s.magnitud.toFixed(1)}</div>
+          <div class="info">
+            <div class="lugar">${s.lugar}</div>
+            <div class="barra-track"><div class="barra-fill ${clase}" style="width:${pct}%"></div></div>
+          </div>
+          <div class="hora">${tiempoRelativo(s.fecha)}</div>
+          <span class="fuente-tag ${s.fuente.toLowerCase()}">${s.fuente}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function actualizarStats(lista) {
+    document.getElementById('stat-total').textContent = lista.length;
+    const max = lista.reduce((m, s) => Math.max(m, s.magnitud), 0);
+    document.getElementById('stat-max').textContent = lista.length ? max.toFixed(1) : '—';
+    document.getElementById('stat-actualizado').textContent = new Date().toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  let sismos = [];
+
+  async function cargarInicial() {
+    try {
+      const res = await fetch('/api/sismos');
+      const data = await res.json();
+      sismos = data.sismos || [];
+      if (sismos.length) renderUltimo(sismos[0]);
+      else document.getElementById('ultimo-sismo').innerHTML = '<span class="vacio">Sin sismos en las últimas 24 horas.</span>';
+      renderFeed(sismos.slice(0, 12));
+      actualizarStats(sismos);
+    } catch (err) {
+      document.getElementById('ultimo-sismo').innerHTML = '<span class="vacio">No se pudo conectar con la API.</span>';
+      document.getElementById('lista-feed').innerHTML = '<p class="vacio">No se pudo conectar con la API.</p>';
+    }
+  }
+
+  cargarInicial();
+
+  if (window.io) {
+    const socket = io(window.location.origin);
+    socket.on('nuevo_sismo', (s) => {
+      sismos = [s, ...sismos].slice(0, 50);
+      renderUltimo(sismos[0]);
+      renderFeed(sismos.slice(0, 12));
+      actualizarStats(sismos);
+    });
+  }
+</script>
+
+</body>
+</html>
