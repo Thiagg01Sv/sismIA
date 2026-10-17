@@ -7,8 +7,6 @@ API en Node.js/Express que combina dos fuentes:
 
 Ambas se consultan en cada ciclo y se combinan; si una falla, la otra sigue funcionando. El resultado se notifica en tiempo real vía WebSocket (Socket.io).
 
-⚠️ **Nota sobre el scraper del MARN:** no es una API oficial documentada, es HTML parseado con cheerio. Si el MARN cambia el formato de su página, `src/services/marnService.js` puede necesitar ajustes.
-
 ## Instalación
 
 ```bash
